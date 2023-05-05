@@ -1,6 +1,6 @@
 defaults:
   - ../reader@reader: mvf_encoder
-  - ../neck@neck: pillarneck
+  - ../neck@neck: aspp
   - ../head@head: centerhead
 
 _target_: det3d.models.detectors.single_stage.SingleStageDetector
