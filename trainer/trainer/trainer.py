@@ -254,7 +254,6 @@ class Trainer(object):
         self.logger.info("max: %d epochs", self.max_epochs) 
         # self.val_epoch()
         # quit()
-        breakpoint()
         while self.epoch < self.max_epochs:
             self.train_epoch()
             if (self.eval_every_nepochs > 0 and self.epoch % self.eval_every_nepochs == 0) or \
