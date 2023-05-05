@@ -1,0 +1,7 @@
+_target_: det3d.models.readers.mvf_encoder.MVFFeatureNet
+num_filters: [48, 48]
+layer_nums: [2, 2, 2, 2]
+ds_layer_strides: [1, 2, 2, 2]
+ds_num_filters: [48, 96, 192, 192]
+kernel_size: [3, 3, 3, 3]
+out_channels: 256

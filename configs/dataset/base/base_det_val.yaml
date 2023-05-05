@@ -1,0 +1,2 @@
+loading_pipelines:
+  - load_pointcloud

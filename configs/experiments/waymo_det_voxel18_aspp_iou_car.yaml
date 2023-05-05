@@ -1,0 +1,64 @@
+# @package _global_
+defaults:
+  - ../models/detectors@model: voxel18_aspp
+  - ../dataset/waymo_det@data
+  - ../dataloader: default
+  - ../optimizer: adamW
+  - ../scheduler: onecycle
+  - ../trainer: default
+  - _self_
+
+_tasks: [['vehicle'], ['pedestrian', 'cyclist']] 
+
+data:
+  train_dataset:
+    prepare_label:
+      centermap:
+        tasks: ${_tasks}
+        pc_range: ${model.reader.pc_range}
+        voxel_size: ${model.reader.voxel_size}
+        out_size_factor: [4, 4]
+
+model:
+  reader:
+    voxel_size: [0.075, 0.075, 0.15]
+    pc_range: [-76.8, -76.8, -2.0, 76.8, 76.8, 4.0]  
+  backbone:  
+    num_input_features: 5
+    ds_layer_strides: [1, 2, 2, 2]
+  neck:
+    in_channels: 256
+    
+  head:
+    tasks: ${_tasks}
+    in_channels: 256
+    strides: [2, 2]
+    weight : 1
+    with_reg_iou: True
+    voxel_size: ${model.reader.voxel_size}
+    pc_range: ${model.reader.pc_range}
+    out_size_factor: ${data.train_dataset.prepare_label.centermap.out_size_factor}
+    rectifier: [[0.68], [0.71, 0.65]]
+    common_heads: 
+      iou: [1, 2]
+  
+  sync_batchnorm: True
+
+  post_processing:
+    post_center_limit_range: [-80.0, -80.0, -10, 80.0, 80.0, 10]  
+    max_per_img: 4096
+    nms_type: iou3d
+    nms:
+      nms_pre_max_size: 4096
+      nms_post_max_size: 500
+      nms_iou_threshold: [[0.7], [0.2, 0.25]]
+    score_threshold: 0.1
+    pc_range: ${model.reader.pc_range}
+    voxel_size: ${model.reader.voxel_size}
+    out_size_factor: ${data.train_dataset.prepare_label.centermap.out_size_factor}
+    
+
+
+
+
+

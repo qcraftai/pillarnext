@@ -1,0 +1,16 @@
+defaults:
+  - base/base_det_train@train_dataset
+  - base/base_det_val@val_dataset
+
+train_dataset:
+  _target_: det3d.datasets.nuscenes.NuScenesDataset
+  nsweeps: 10
+  root_path: /mnt/sda/jinyu/datasets/nuscenes
+  info_path: infos_train_10sweeps_withvelo_filterZero.pkl
+  resampling: True
+
+val_dataset:
+  _target_: det3d.datasets.nuscenes.NuScenesDataset
+  nsweeps: 10
+  root_path: ${data.train_dataset.root_path}
+  info_path: infos_val_10sweeps_withvelo_filterZero.pkl

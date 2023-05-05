@@ -1,0 +1,8 @@
+defaults:
+  - ../reader@reader: voxel_encoder
+  - ../backbone@backbone: 3d_sparse_resnet18
+  - ../neck@neck: aspp
+  - ../head@head: centerhead
+
+_target_: det3d.models.detectors.single_stage.SingleStageDetector
+

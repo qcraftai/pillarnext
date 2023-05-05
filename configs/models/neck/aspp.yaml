@@ -1,0 +1,2 @@
+_target_: det3d.models.necks.aspp.ASPPNeck
+_recursive_: False

@@ -1,0 +1,90 @@
+# @package _global_
+defaults:
+  - ../models/detectors@model: voxel18_aspp
+  - ../dataset/nusc_det@data
+  - ../dataloader: default
+  - ../optimizer: adamW
+  - ../scheduler: onecycle
+  - ../trainer: default
+  - _self_
+
+_tasks: [["car"], ["truck", "construction_vehicle"], ["bus", "trailer"], ["barrier"], ["motorcycle", "bicycle"], ["pedestrian", "traffic_cone"] ]
+model:
+  reader:
+    voxel_size: [0.075, 0.075, 0.2]
+    pc_range: [-50.4, -50.4, -5.0, 50.4, 50.4, 3.0]
+  backbone:
+    num_input_features: 5
+    ds_layer_strides: [1, 2, 2, 2]
+    ds_num_filters: [18, 36, 72, 144]
+  neck:
+    in_channels: 256
+    
+  head:
+    tasks: ${_tasks}
+    in_channels: 256
+    weight : 0.25
+    strides: [2, 2, 2, 2, 2, 2]
+    rectifier: [[0.5], [0.5, 0.5], [0.5, 0.5], [0.5], [0.5, 0.5], [0.5, 0.5]]
+    with_reg_iou: True
+    voxel_size: ${model.reader.voxel_size}
+    pc_range: ${model.reader.pc_range}
+    out_size_factor: ${data.train_dataset.prepare_label.centermap.out_size_factor}
+    # common_heads:
+    #   iou: [1, 2]
+  
+  sync_batchnorm: True
+
+  post_processing:
+    post_center_limit_range: [-61.2, -61.2, -10.0, 61.2, 61.2, 10.0]
+    max_per_img: 500
+    nms_type: iou3d
+    nms:
+      nms_pre_max_size: 1000
+      nms_post_max_size: 83
+      nms_iou_threshold: [[0.2], [0.2, 0.2], [0.2, 0.2], [0.2], [0.2, 0.2], [0.2, 0.2]]
+    score_threshold: 0.1
+    pc_range: ${model.reader.pc_range}
+    voxel_size: ${model.reader.voxel_size}
+    out_size_factor: ${data.train_dataset.prepare_label.centermap.out_size_factor}
+
+
+
+
+data:
+  train_dataset:
+    class_names: ${_tasks}
+    sampler:
+      _target_: det3d.datasets.pipelines.sample_ops.DataBaseSamplerV2
+      root_path: ${data.train_dataset.root_path}
+      dbinfo_path: dbinfos_train_10sweeps_withvelo.pkl
+      groups: 
+        ['car': 2, 'truck': 3, 'construction_vehicle': 7, 'bus': 4, 'trailer': 6, 'barrier': 2, 'motorcycle': 6, 'bicycle': 6, 'pedestrian': 2, 'traffic_cone': 2]
+      db_prepor:
+        filter_by_num:
+          _target_: det3d.datasets.pipelines.sample_ops.DBFilterByMinNumPoint
+          min_gt_point_dict:
+            car: 5
+            truck: 5
+            bus: 5
+            trailer: 5
+            construction_vehicle: 5
+            traffic_cone: 5
+            barrier: 5
+            motorcycle: 5
+            bicycle: 5
+            pedestrian: 5
+      rate: 1.0
+      gt_drop_percentage: 0
+      gt_drop_max_keep_points: -1
+      point_dim: 5
+    prepare_label:
+      centermap:
+        tasks: ${_tasks}
+        pc_range: ${model.reader.pc_range}
+        voxel_size: ${model.reader.voxel_size}
+        out_size_factor: [4, 4, 4, 4, 4, 4]
+    resampling: True
+  val_dataset:
+    class_names: ${_tasks}
+

@@ -1,0 +1,12 @@
+rotation:
+  _target_: det3d.datasets.pipelines.augmentation.Rotation
+  rotation: [-0.785, 0.785]
+scaling:
+  _target_: det3d.datasets.pipelines.augmentation.Scaling
+  scale: [0.9, 1.1]
+translation:
+  _target_: det3d.datasets.pipelines.augmentation.Translation
+  noise: 0.5
+flip:
+  _target_: det3d.datasets.pipelines.augmentation.Flip
+  flip_prob: [0.5, 0.5]

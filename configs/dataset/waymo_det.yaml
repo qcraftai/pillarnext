@@ -1,0 +1,17 @@
+defaults:
+  - base/base_det_train@train_dataset
+  - base/base_det_val@val_dataset
+
+train_dataset:
+  _target_: det3d.datasets.waymo.waymo.WaymoDataset
+  nsweeps: 3
+  root_path: /mnt/sda/jinyu/datasets/waymo_det/
+  info_path: waymo_infos_train.pkl
+  drop_frames: 0.5
+
+val_dataset:
+  _target_: ${data.train_dataset._target_}
+  nsweeps: 3
+  root_path: ${data.train_dataset.root_path}
+  info_path: waymo_infos_val.pkl
+  drop_frames: 0

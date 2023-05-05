@@ -1,0 +1,82 @@
+# @package _global_
+defaults:
+  - ../models/detectors@model: pillarnet18_aspp
+  - ../dataset/waymo_det@data
+  - ../dataloader: default
+  - ../optimizer: adamW
+  - ../scheduler: onecycle
+  - ../trainer: default
+  - _self_
+
+_tasks: [['vehicle'], ['pedestrian', 'cyclist']] 
+
+data:
+  train_dataset:
+    # sampler:
+    #   _target_: det3d.datasets.pipelines.sample_ops.DataBaseSamplerV2
+    #   root_path: ${data.train_dataset.root_path}
+    #   dbinfo_path: dbinfos_train_1sweeps_withvelo.pkl
+    #   groups: 
+    #     ['vehicle': 15, 'pedestrian': 10, 'cyclist': 10]
+    #   db_prepor:
+    #     filter_by_num:
+    #       _target_: det3d.datasets.pipelines.sample_ops.DBFilterByMinNumPoint
+    #       min_gt_point_dict:
+    #         vehicle: 5
+    #         pedestrian: 5
+    #         cyclist: 5
+    #   rate: 1.0
+    #   gt_drop_percentage: 0
+    #   gt_drop_max_keep_points: -1
+    #   point_dim: 5
+    prepare_label:
+      centermap:
+        tasks: ${_tasks}
+        pc_range: ${model.reader.pc_range}
+        voxel_size: ${model.reader.voxel_size}
+        out_size_factor: [4, 4]
+
+model:
+  reader:
+    num_input_features: 5
+    voxel_size: [0.075, 0.075, 20]
+    pc_range: [-76.8, -76.8, -10.0, 76.8, 76.8, 10.0]  
+  backbone:  
+    num_input_features: ${model.reader.num_filters[1]}
+    ds_layer_strides: [1, 2, 2, 2]
+  neck:
+    in_channels: 256
+    
+  head:
+    tasks: ${_tasks}
+    in_channels: 256
+    strides: [2, 2]
+    weight : 1
+    with_reg_iou: True
+    voxel_size: ${model.reader.voxel_size}
+    pc_range: ${model.reader.pc_range}
+    out_size_factor: ${data.train_dataset.prepare_label.centermap.out_size_factor}
+    rectifier: [[0.68], [0.71, 0.65]]
+    common_heads: 
+      iou: [1, 2]
+  
+  sync_batchnorm: True
+
+  post_processing:
+    post_center_limit_range: [-80.0, -80.0, -10, 80.0, 80.0, 10]  
+    max_per_img: 4096
+    nms_type: iou3d
+    nms:
+      nms_pre_max_size: 4096
+      nms_post_max_size: 500
+      nms_iou_threshold: [[0.7], [0.2, 0.25]]
+    score_threshold: 0.1
+    pc_range: ${model.reader.pc_range}
+    voxel_size: ${model.reader.voxel_size}
+    out_size_factor: ${data.train_dataset.prepare_label.centermap.out_size_factor}
+    
+
+
+
+
+

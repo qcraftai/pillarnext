@@ -1,0 +1,11 @@
+build/
+det3d.egg-info/
+outputs/
+**/*.so
+**/*.pkl
+**/__pycache__
+**/.DS_Store
+.ipynb_checkpoints
+**/*.bk
+**/*.o
+

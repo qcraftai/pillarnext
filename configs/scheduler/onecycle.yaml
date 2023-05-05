@@ -1,0 +1,6 @@
+# @package scheduler
+_target_: torch.optim.lr_scheduler.OneCycleLR
+max_lr: 0.002
+div_factor: 10.0
+pct_start: 0.4
+epochs: ${trainer.max_epochs}

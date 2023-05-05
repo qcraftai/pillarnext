@@ -1,0 +1,10 @@
+# @package dataloader
+train:
+  batch_size: 4
+  num_workers: 16
+  shuffle: True
+
+val:
+  batch_size: 4
+  num_workers: 16
+  shuffle: False

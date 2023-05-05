@@ -1,0 +1,7 @@
+defaults:
+  - ../reader@reader: pillar_encoder
+  - ../backbone@backbone: sparse_second
+  - ../neck@neck: fpn
+  - ../head@head: centerhead
+
+_target_: det3d.models.detectors.single_stage.SingleStageDetector

@@ -1,0 +1,3 @@
+_target_: det3d.models.readers.pillar_encoder.PillarFeatureNet
+num_filters: [64, 64]
+num_input_features: 6

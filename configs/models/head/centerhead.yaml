@@ -1,0 +1,8 @@
+_target_: det3d.models.heads.centerhead.CenterHead
+code_weights: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.2, 0.2, 1.0, 1.0]
+common_heads: 
+  reg: [2, 2]
+  height: [1, 2] 
+  dim: [3, 2]
+  rot: [2, 2]
+  vel: [2, 2]
