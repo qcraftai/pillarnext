@@ -12,23 +12,23 @@ _tasks: [['vehicle'], ['pedestrian', 'cyclist']]
 
 data:
   train_dataset:
-    # sampler:
-    #   _target_: det3d.datasets.pipelines.sample_ops.DataBaseSamplerV2
-    #   root_path: ${data.train_dataset.root_path}
-    #   dbinfo_path: dbinfos_train_1sweeps_withvelo.pkl
-    #   groups: 
-    #     ['vehicle': 15, 'pedestrian': 10, 'cyclist': 10]
-    #   db_prepor:
-    #     filter_by_num:
-    #       _target_: det3d.datasets.pipelines.sample_ops.DBFilterByMinNumPoint
-    #       min_gt_point_dict:
-    #         vehicle: 5
-    #         pedestrian: 5
-    #         cyclist: 5
-    #   rate: 1.0
-    #   gt_drop_percentage: 0
-    #   gt_drop_max_keep_points: -1
-    #   point_dim: 5
+    sampler:
+      _target_: det3d.datasets.pipelines.sample_ops.DataBaseSamplerV2
+      root_path: ${data.train_dataset.root_path}
+      dbinfo_path: dbinfos_train_1sweeps_withvelo.pkl
+      groups: 
+        ['vehicle': 15, 'pedestrian': 10, 'cyclist': 10]
+      db_prepor:
+        filter_by_num:
+          _target_: det3d.datasets.pipelines.sample_ops.DBFilterByMinNumPoint
+          min_gt_point_dict:
+            vehicle: 5
+            pedestrian: 5
+            cyclist: 5
+      rate: 1.0
+      gt_drop_percentage: 0
+      gt_drop_max_keep_points: -1
+      point_dim: 5
     prepare_label:
       centermap:
         tasks: ${_tasks}
