@@ -1,3 +1,3 @@
-## Exploring Simple 3D Multi-Object Tracking for Autonomous Driving (CVPR 2023)
+## PillarNeXt: Rethinking Network Designs for 3D Object Detection in LiDAR Point Clouds (CVPR 2023)
 
 Coming soon
