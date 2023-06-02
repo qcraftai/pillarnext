@@ -29,7 +29,9 @@ create database for copy and paste
 `bash tools/train.sh`  
 You could modify args in `train.sh`  
 ***Faded Stratedy***  
-Do not use copy and paste stratedy in the last two epochs.
+For nuScenes, do not use copy and paste strategy in the last two epochs.
+
+For Waymo, do not use copy and paste strategy in the last 4-6 epochs.
 ### Eval for Waymo
 Use scripts to generate `*.bin` for official evaluation tools  
 `python det3d/datasets/waymo/waymo_common.py`  
