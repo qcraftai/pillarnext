@@ -13,7 +13,8 @@ Download data and organize as follows
 python tools/create_data  nuscenes_data_prep --root_path /path/to/nuscenes
 ```
 
-##  Waymo Open Dataset   
+##  Waymo Open Dataset 
+Download data and organize as follows  
 ```      
 └── WAYMO_DATASET_ROOT
     └── tfrecord
@@ -21,6 +22,8 @@ python tools/create_data  nuscenes_data_prep --root_path /path/to/nuscenes
        ├── val   
        ├── test
 ```
+Run
 ```
-python tools/create_data.py waymo_data_prep /path/to/raw/waymo/ /path/to/save/converted_waymo/` to generate data for waymo
+python tools/create_data.py waymo_data_prep /path/to/raw/waymo/ /path/to/save/converted_waymo/ 
 ```
+to generate data for waymo
