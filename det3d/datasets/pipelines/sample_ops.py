@@ -2,12 +2,9 @@ import abc
 import copy
 import pathlib
 import pickle
-import time
-from functools import partial, reduce
 
 import numpy as np
 from det3d.core.bbox import box_np_ops
-from det3d.utils.check import shape_mergeable
 
 
 class BatchSampler:
@@ -28,10 +25,10 @@ class BatchSampler:
 
     def _sample(self, num):
         if self._idx + num >= self._example_num:
-            ret = self._indices[self._idx :].copy()
+            ret = self._indices[self._idx:].copy()
             self._reset()
         else:
-            ret = self._indices[self._idx : self._idx + num]
+            ret = self._indices[self._idx: self._idx + num]
             self._idx += num
         return ret
 
@@ -72,16 +69,16 @@ class DBFilterByMinNumPoint(DataBasePreprocessing):
 
 class DataBaseSamplerV2:
     def __init__(
-        self,
-        root_path,
-        dbinfo_path,
-        groups,
-        db_prepor,
-        rate,
-        gt_drop_percentage,
-        gt_drop_max_keep_points,
-        point_dim):
-        
+            self,
+            root_path,
+            dbinfo_path,
+            groups,
+            db_prepor,
+            rate,
+            gt_drop_percentage,
+            gt_drop_max_keep_points,
+            point_dim):
+
         self.root_path = root_path
         with open(pathlib.Path(root_path) / dbinfo_path, "rb") as f:
             db_infos = pickle.load(f)
@@ -98,7 +95,7 @@ class DataBaseSamplerV2:
         self._sample_classes = []
         self._sample_max_nums = []
         self._point_dim = point_dim
-       
+
         self._group_db_infos = self.db_infos  # just use db_infos
         for group_info in groups:
             group_names = list(group_info.keys())
@@ -108,7 +105,7 @@ class DataBaseSamplerV2:
         self._sampler_dict = {}
         for k, v in self._group_db_infos.items():
             self._sampler_dict[k] = BatchSampler(v, k)
-       
+
         self._gt_drop_rate = gt_drop_percentage
         self._gt_drop_max_keep = gt_drop_max_keep_points
 
@@ -116,7 +113,7 @@ class DataBaseSamplerV2:
         self,
         gt_boxes,
         gt_names,
-        ):
+    ):
         root_path = self.root_path
         sampled_num_dict = {}
         sample_num_per_class = []
@@ -132,7 +129,7 @@ class DataBaseSamplerV2:
             sample_num_per_class.append(sampled_num)
 
         sampled_groups = self._sample_classes
-       
+
         sampled = []
         sampled_gt_boxes = []
         avoid_coll_boxes = gt_boxes
@@ -140,7 +137,7 @@ class DataBaseSamplerV2:
         for class_name, sampled_num in zip(sampled_groups, sample_num_per_class):
             if sampled_num > 0:
                 sampled_cls = self.sample_class_v2(
-                        class_name, sampled_num, avoid_coll_boxes)
+                    class_name, sampled_num, avoid_coll_boxes)
 
                 sampled += sampled_cls
                 if len(sampled_cls) > 0:
@@ -150,11 +147,10 @@ class DataBaseSamplerV2:
                         sampled_gt_box = np.stack(
                             [s["box3d_lidar"] for s in sampled_cls], axis=0
                         )
-                    
+
                     sampled_gt_boxes += [sampled_gt_box]
                     avoid_coll_boxes = np.concatenate(
                         [avoid_coll_boxes, sampled_gt_box], axis=0)
-                    
 
         if len(sampled) > 0:
             sampled_gt_boxes = np.concatenate(sampled_gt_boxes, axis=0)
@@ -162,18 +158,18 @@ class DataBaseSamplerV2:
             s_points_list = []
             for info in sampled:
                 s_points = np.fromfile(
-                            str(pathlib.Path(root_path) / info["path"]), dtype=np.float32
-                        ).reshape(-1, self._point_dim)
+                    str(pathlib.Path(root_path) / info["path"]), dtype=np.float32
+                ).reshape(-1, self._point_dim)
                 #s_points = s_points[s_points[:, -1] <0.02, :]
                 if "rot_transform" in info:
-                        rot = info["rot_transform"]
-                        s_points[:, :3] = box_np_ops.yaw_rotation(
-                            s_points[:, :4], rot, axis=2
-                        )
+                    rot = info["rot_transform"]
+                    s_points[:, :3] = box_np_ops.yaw_rotation(
+                        s_points[:, :4], rot, axis=2
+                    )
                 s_points[:, :3] += info["box3d_lidar"][:3]
-                    
+
                 s_points_list.append(s_points)
-       
+
             if 1 > self._gt_drop_rate > 0:
                 counts = np.zeros((num_sampled,))
                 for i in range(len(s_points_list)):
@@ -184,7 +180,7 @@ class DataBaseSamplerV2:
                 mask2keep = counts >= self._gt_drop_max_keep
             else:
                 mask2keep = np.ones((num_sampled,), dtype=np.bool_)
-            #sampled_gt_boxes[:, 6:8] = 0 # np.nan
+            # sampled_gt_boxes[:, 6:8] = 0 # np.nan
             ret = {
                 "gt_names": np.array([s["name"] for s in sampled]),
                 "difficulty": np.array([s["difficulty"] for s in sampled]),
@@ -192,8 +188,9 @@ class DataBaseSamplerV2:
                 "points": np.concatenate(s_points_list, axis=0).astype(np.float32),
                 "gt_masks": mask2keep,
             }
-            
-            ret["group_ids"] = np.arange(gt_boxes.shape[0], gt_boxes.shape[0] + len(sampled))
+
+            ret["group_ids"] = np.arange(
+                gt_boxes.shape[0], gt_boxes.shape[0] + len(sampled))
         else:
             ret = None
         return ret
@@ -201,7 +198,6 @@ class DataBaseSamplerV2:
     def sample(self, name, num):
         ret = self._sampler_dict[name].sample(num)
         return ret, np.ones((len(ret),), dtype=np.int64)
-
 
     def sample_class_v2(self, name, num, gt_boxes):
         sampled = self._sampler_dict[name].sample(num)
@@ -212,14 +208,14 @@ class DataBaseSamplerV2:
             gt_boxes[:, [0, 1, 3, 4, -1]])
 
         sp_boxes = np.stack([i["box3d_lidar"] for i in sampled], axis=0)
-        
+
         valid_mask = np.zeros([gt_boxes.shape[0]], dtype=np.bool_)
         valid_mask = np.concatenate(
             [valid_mask, np.ones([sp_boxes.shape[0]], dtype=np.bool_)], axis=0
         )
         boxes = np.concatenate([gt_boxes, sp_boxes], axis=0).copy()
-        
-        sp_boxes_new = boxes[gt_boxes.shape[0] :]
+
+        sp_boxes_new = boxes[gt_boxes.shape[0]:]
         sp_boxes_bv = box_np_ops.center_to_corner_box2d(
             sp_boxes_new[:, [0, 1, 3, 4, -1]]
         )

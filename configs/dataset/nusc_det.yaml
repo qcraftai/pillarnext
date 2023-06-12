@@ -5,12 +5,12 @@ defaults:
 train_dataset:
   _target_: det3d.datasets.nuscenes.NuScenesDataset
   nsweeps: 10
-  root_path: /mnt/sda/jinyu/datasets/nuscenes
+  root_path: /home/qcraft/data/nuscenes
   info_path: infos_train_10sweeps_withvelo_filterZero.pkl
   resampling: True
 
 val_dataset:
-  _target_: det3d.datasets.nuscenes.NuScenesDataset
+  _target_: ${data.train_dataset._target_}
   nsweeps: 10
   root_path: ${data.train_dataset.root_path}
   info_path: infos_val_10sweeps_withvelo_filterZero.pkl

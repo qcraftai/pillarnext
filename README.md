@@ -1,43 +1,56 @@
 # PillarNeXt: Rethinking Network Designs for 3D Object Detection in LiDAR Point Clouds
-## Docker
-pull docker image for waymo  
-`docker pull jinyuli1999/det3d:waymo`  
-pull docker image for nuscenes  
-`docker pull jinyuli1999/det3d:nusc`
-## Usage
-compile cuda extension  
-`cd /your/path/pillarnext/`  
-`pip install -e .`
-### Prepare Data
-#### ***prepare data for waymo***
+
+Official code for *PillarNeXt: Rethinking Network Designs for 3D Object Detection in LiDAR Point Clouds.* &nbsp;  [[paper]](https://openaccess.thecvf.com/content/CVPR2023/html/Li_PillarNeXt_Rethinking_Network_Designs_for_3D_Object_Detection_in_LiDAR_CVPR_2023_paper.html)&nbsp;&nbsp;[[arxiv]](https://arxiv.org/abs/2305.04925)
+
+Jinyu Li, Chenxu Luo, Xiaodong Yang
+
+
+
+
+<p align="center"> <img src='docs/arch.png' align="center" height="230px"> </p>
+
+## Get Started
+
+### Installation
+Please refer to [INSTALL](docs/INSTALL.md) to set up environment and install dependencies. Please refer to the [Dockerfile](docker/Dockerfile) for detail.
+
+### Data Preparation
+Please refer to [DATA](docs/DATA.md) for detail. 
+
+### Training and Evalution 
+Please refer to [Training](docs/Training.md) for detail.
+
+
+## Main Results
+### nuScenes (val)
+| Model |  mAP  |  NDS | checkpoint
+| ------| -----| ---- | -------------|
+ | PillarNeXt-B| 62.5 | 68.8	 | [[Google Drive]](https://drive.google.com/file/d/16abCgt-yhRGnYHQ7M259yGMO0IRYpZ8o/view?usp=drive_link)  &nbsp;&nbsp;[[Baidu Yunpan]](https://pan.baidu.com/s/1TRsjgN1ys5-mAxM70l4hog?pwd=7skt)(7skt)
+
+### Waymo Open Dataset 
+|Split | #frames | Veh L2 | Ped L2 | Cyc L2 | 
+| ---------| ---------|---------|---------|---------|
+| val | 1 | 67.8 | 69.8 | 69.6|
+| val | 3| 72.4 | 75.2 | 75.7 |
+| test| 3 | 75.8 | 76.0 | 70.6 |
+
+All numbers are 3D mAPH. 
+
+
+## Citation
+ If you find this code useful in your research, please consider citing:
 ```
-# For Waymo Dataset         
-└── WAYMO_DATASET_ROOT
-    └── tfrecord
-       ├── train       
-       ├── val   
-       ├── test
+@inproceedings{li2023pillarnext,
+  title={PillarNeXt: Rethinking Network Designs for 3D Object Detection in LiDAR Point Clouds},
+  author={Li, Jinyu and Luo, Chenxu and Yang, Xiaodong},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  pages={17567--17576},
+  year={2023}
+}
 ```
-`python det3d/datasets/waymo/scripts/waymo_convert.py`  
-create database for copy and paste  
-`python det3d/datasets/utils/create_gt_database.py`
-#### ***prepare data for nuscenes***
-`python det3d/datasets/nuscenes/scripts/nusc_common.py`  
-create database for copy and paste  
-`python det3d/datasets/utils/create_gt_database.py`
-### Training
-`bash tools/train.sh`  
-You could modify args in `train.sh`  
-***Faded Stratedy***  
-For nuScenes, do not use copy and paste strategy in the last two epochs.
 
-For Waymo, do not use copy and paste strategy in the last 4-6 epochs.
-### Eval for Waymo
-Use scripts to generate `*.bin` for official evaluation tools  
-`python det3d/datasets/waymo/waymo_common.py`  
-[waymo official evaluation tools](https://github.com/waymo-research/waymo-open-dataset/blob/r1.3/docs/quick_start.md) 
-## Checkpoints
-Use trained checkpoints to recurrent our results on nuScenes. [Weights for nuScenes](https://drive.google.com/file/d/1lj2q85r44_Sa-wj_nKCPx-gHDLJTA2p-/view?usp=sharing)  
-`bash tools/test.sh`
-
-
+### Acknowledgement
+This project is not possible without multiple great opensourced codebases. We list some notable examples below.
+* [det3d](https://github.com/poodarchu/Det3D)
+* [CenterPoint](https://github.com/tianweiy/CenterPoint)
+* [OpenPCDet](https://github.com/open-mmlab/OpenPCDet)

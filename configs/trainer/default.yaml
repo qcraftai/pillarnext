@@ -2,6 +2,3 @@
 clip_grad_val: 35
 eval_every_nepochs: 1
 max_epochs: 20
-callbacks:
-  - _target_: trainer.logger.text.TextLogger
-    log_every_niters: 50

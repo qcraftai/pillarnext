@@ -1,5 +1,0 @@
-_target_: det3d.models.backbones.sparse_resnet.SparseResNet
-_recursive_: False
-layer_nums: [2, 2, 8, 2]
-ds_layer_strides: [2, 2, 2, 1]
-ds_num_filters: [64, 128, 256, 256]

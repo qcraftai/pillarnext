@@ -8,13 +8,22 @@ import warnings
 from setuptools import find_packages, setup, Extension, dist
 from torch.utils.cpp_extension import BuildExtension, CUDAExtension
 
+def readme():
+    with open("README.md", encoding="utf-8") as f:
+        content = f.read()
+    return content
+
 
 if __name__ == '__main__':
     setup(
         name='det3d',
-        packages=find_packages(exclude=('configs', 'tools', 'demo')),
+        version='1.0.0',
+        description="PillarNeXt",
+        long_description=readme(),
+        author="Jinyu Li and Chenxu Luo",
+        packages=find_packages(exclude=('configs', 'tools')),
         include_package_data=True,
-        license='Apache License 2.0',
+        license='Attribution-NonCommercial-ShareAlike 4.0 International',
         ext_modules=[
             CUDAExtension(
                 name="det3d.core.iou3d_nms.iou3d_nms_cuda",

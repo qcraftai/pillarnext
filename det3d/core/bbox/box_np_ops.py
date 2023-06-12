@@ -1,45 +1,50 @@
 import numba
 import numpy as np
 
+
 def flip(boxes, axis):
     if axis == 'x':
         boxes[:, 1] = -boxes[:, 1]
-        boxes[:, -1] = -boxes[:, -1] 
-        if boxes.shape[1] > 7:  #  x, y, z, l, w, h, vx, vy, rz
-            boxes[:, 7] = -boxes[:, 7] 
+        boxes[:, -1] = -boxes[:, -1]
+        if boxes.shape[1] > 7:  # x, y, z, l, w, h, vx, vy, rz
+            boxes[:, 7] = -boxes[:, 7]
     elif axis == 'y':
         boxes[:, 0] = -boxes[:, 0]
-        boxes[:, -1] = -boxes[:, -1] + np.pi  
+        boxes[:, -1] = -boxes[:, -1] + np.pi
 
-        if boxes.shape[1] > 7:  
+        if boxes.shape[1] > 7:
             boxes[:, 6] = -boxes[:, 6]
     else:
         raise Exception('Unknown flip axis!')
-    
+
     cond = boxes[:, -1] > np.pi
     boxes[cond, -1] = boxes[cond, -1] - 2 * np.pi
-    
+
     cond = boxes[:, -1] < -np.pi
     boxes[cond, -1] = boxes[cond, -1] + 2 * np.pi
 
     return boxes
 
+
 def scaling(boxes, noise):
     boxes[:, :-1] *= noise
     return boxes
+
 
 def rotate(boxes, noise_rotation):
     boxes[:, :3] = yaw_rotation(boxes[:, :3], noise_rotation)
     if boxes.shape[1] > 7:
         boxes[:, 6:8] = yaw_rotation(np.hstack([boxes[:, 6:8], np.zeros((boxes.shape[0], 1))]),
-            noise_rotation)[:, :2]
-    
+                                     noise_rotation)[:, :2]
+
     boxes[:, -1] += noise_rotation
     return boxes
 
-def translate(boxes,  noise_translate):
+
+def translate(boxes, noise_translate):
     boxes[:, :3] += noise_translate
     return boxes
+
 
 def corners_nd(dims, origin=0.5):
     """generate relative box corners based on length per dim and
@@ -70,8 +75,10 @@ def corners_nd(dims, origin=0.5):
     elif ndim == 3:
         corners_norm = corners_norm[[0, 1, 3, 2, 4, 5, 7, 6]]
     corners_norm = corners_norm - np.array(origin, dtype=dims.dtype)
-    corners = dims.reshape([-1, 1, ndim]) * corners_norm.reshape([1, 2 ** ndim, ndim])
+    corners = dims.reshape([-1, 1, ndim]) * \
+        corners_norm.reshape([1, 2 ** ndim, ndim])
     return corners
+
 
 def center_to_corner_box3d(boxes):
     """convert locations, dimensions and angles to corners
@@ -93,7 +100,7 @@ def center_to_corner_box3d(boxes):
     return corners
 
 
-def center_to_corner_box2d(boxes): # corrected 
+def center_to_corner_box2d(boxes):  # corrected
     """convert locations, dimensions and angles to corners.
     format: center(xy), dims(xy), yaw_angle
 
@@ -109,24 +116,25 @@ def center_to_corner_box2d(boxes): # corrected
     # corners: [N, 4, 2]
     corners = rotation_2d(corners, boxes[:, -1])
     corners += boxes[:, :2].reshape([-1, 1, 2])
-    return corners 
+    return corners
+
 
 def yaw_rotation(points, yaw):
     rot_sin = np.sin(yaw)
     rot_cos = np.cos(yaw)
 
-
     rot_mat_T = np.stack(
-            [
-                [rot_cos, rot_sin, 0],
-                [-rot_sin, rot_cos, 0],
-                [0, 0, 1],
-            ]
-        )
+        [
+            [rot_cos, rot_sin, 0],
+            [-rot_sin, rot_cos, 0],
+            [0, 0, 1],
+        ]
+    )
 
     return points @ rot_mat_T
 
-def rotation_3d(points, yaw): # corrected 
+
+def rotation_3d(points, yaw):  # corrected
     # points: [N, 8, 3]
     rot_sin = np.sin(yaw)
     rot_cos = np.cos(yaw)
@@ -134,14 +142,15 @@ def rotation_3d(points, yaw): # corrected
     ones = np.ones_like(rot_sin)
 
     rot_mat_T = np.stack(
-            [
-                [rot_cos, rot_sin, zeros],
-                [-rot_sin, rot_cos, zeros],
-                [zeros, zeros, ones],
-            ]
-        )
+        [
+            [rot_cos, rot_sin, zeros],
+            [-rot_sin, rot_cos, zeros],
+            [zeros, zeros, ones],
+        ]
+    )
 
     return np.einsum("aij,jka->aik", points, rot_mat_T)
+
 
 def rotation_2d(points, angles):  # corrected, counterclock wise
     """rotation 2d points with given angle
@@ -172,103 +181,35 @@ def corner_to_standup_nd_jit(boxes_corner):
     return result
 
 
-def points_in_rbbox(points, rbbox):
-    rbbox_corners = center_to_corner_box3d(rbbox)
-    surfaces = corner_to_surfaces_3d(rbbox_corners)
-    indices = points_in_convex_polygon_3d_jit(points[:, :3], surfaces)
+def points_in_rbbox(points, boxes):
+    indices = np.zeros((points.shape[0], boxes.shape[0]), dtype=bool)
+    points_in_boxes_jit(points, boxes, indices)
     return indices
 
 
-def corner_to_surfaces_3d(corners):
-    """convert 3d box corners from corner function above
-    to surfaces that normal vectors all direct to internal.
-
-    Args:
-        corners (float array, [N, 8, 3]): 3d box corners.
-    Returns:
-        surfaces (float array, [N, 6, 4, 3]):
-    """
-    # box_corners: [N, 8, 3], must from corner functions in this module
-    surfaces = np.array(
-        [
-            [corners[:, 0], corners[:, 1], corners[:, 2], corners[:, 3]],
-            [corners[:, 7], corners[:, 6], corners[:, 5], corners[:, 4]],
-            [corners[:, 0], corners[:, 3], corners[:, 7], corners[:, 4]],
-            [corners[:, 1], corners[:, 5], corners[:, 6], corners[:, 2]],
-            [corners[:, 0], corners[:, 4], corners[:, 5], corners[:, 1]],
-            [corners[:, 3], corners[:, 2], corners[:, 6], corners[:, 7]],
-        ]
-    ).transpose([2, 0, 1, 3])
-    return surfaces
-
 @numba.njit
-def surface_equ_3d_jit(surfaces):
-    # polygon_surfaces: [num_polygon, num_surfaces, num_points_of_polygon, 3]
-    num_polygon = surfaces.shape[0]
-    max_num_surfaces = surfaces.shape[1]
-    normal_vec = np.zeros((num_polygon, max_num_surfaces, 3), dtype=surfaces.dtype)
-    d = np.zeros((num_polygon, max_num_surfaces), dtype=surfaces.dtype)
-    sv0 = surfaces[0, 0, 0] - surfaces[0, 0, 1]
-    sv1 = surfaces[0, 0, 0] - surfaces[0, 0, 1]
-    for i in range(num_polygon):
-        for j in range(max_num_surfaces):
-            sv0[0] = surfaces[i, j, 0, 0] - surfaces[i, j, 1, 0]
-            sv0[1] = surfaces[i, j, 0, 1] - surfaces[i, j, 1, 1]
-            sv0[2] = surfaces[i, j, 0, 2] - surfaces[i, j, 1, 2]
-            sv1[0] = surfaces[i, j, 1, 0] - surfaces[i, j, 2, 0]
-            sv1[1] = surfaces[i, j, 1, 1] - surfaces[i, j, 2, 1]
-            sv1[2] = surfaces[i, j, 1, 2] - surfaces[i, j, 2, 2]
-            normal_vec[i, j, 0] = sv0[1] * sv1[2] - sv0[2] * sv1[1]
-            normal_vec[i, j, 1] = sv0[2] * sv1[0] - sv0[0] * sv1[2]
-            normal_vec[i, j, 2] = sv0[0] * sv1[1] - sv0[1] * sv1[0]
-
-            d[i, j] = (
-                -surfaces[i, j, 0, 0] * normal_vec[i, j, 0]
-                - surfaces[i, j, 0, 1] * normal_vec[i, j, 1]
-                - surfaces[i, j, 0, 2] * normal_vec[i, j, 2]
-            )
-    return normal_vec, d
-
-
-@numba.njit
-def points_in_convex_polygon_3d_jit(points, polygon_surfaces, num_surfaces=None):
-    """check points is in 3d convex polygons.
-    Args:
-        points: [num_points, 3] array.
-        polygon_surfaces: [num_polygon, max_num_surfaces,
-            max_num_points_of_surface, 3]
-            array. all surfaces' normal vector must direct to internal.
-            max_num_points_of_surface must at least 3.
-        num_surfaces: [num_polygon] array. indicate how many surfaces
-            a polygon contain
-    Returns:
-        [num_points, num_polygon] bool array.
-    """
-    num_polygons = polygon_surfaces.shape[0]
-    if num_surfaces is None:
-        num_surfaces = np.full((num_polygons,), 9999999, dtype=np.int64)
-    normal_vec, d = surface_equ_3d_jit(polygon_surfaces[:, :, :3, :])
-    
-    max_num_surfaces, _ = polygon_surfaces.shape[1:3]
+def points_in_boxes_jit(points, boxes, indices):
+    '''
+    Input:
+        points: float array [N, *],
+        boxes:  float array[M, 7] or [M, 9],
+                with first 6 dimensions x, y, z, length, width, height, last dimension yaw angle
+    return:
+        bool array of shape [N, M]
+    '''
     num_points = points.shape[0]
-    num_polygons = polygon_surfaces.shape[0]
-    ret = np.ones((num_points, num_polygons), dtype=np.bool_)
-    sign = 0.0
-    for i in range(num_points):
-        for j in range(num_polygons):
-            for k in range(max_num_surfaces):
-                if k > num_surfaces[j]:
-                    break
-                sign = (
-                    points[i, 0] * normal_vec[j, k, 0]
-                    + points[i, 1] * normal_vec[j, k, 1]
-                    + points[i, 2] * normal_vec[j, k, 2]
-                    + d[j, k]
-                )
-                if sign >= 0:
-                    ret[i, j] = False
-                    break
-    return ret
+    num_boxes = boxes.shape[0]
+    for j in range(num_boxes):
+        for i in range(num_points):
+            if np.abs(points[i, 2] - boxes[j, 2]) <= boxes[j, 5] / 2.0:
+                cosa = np.cos(boxes[j, -1])
+                sina = np.sin(boxes[j, -1])
+                shift_x = points[i, 0] - boxes[j, 0]
+                shift_y = points[i, 1] - boxes[j, 1]
+                local_x = shift_x * cosa + shift_y * sina
+                local_y = -shift_x * sina + shift_y * cosa
+                indices[i, j] = np.logical_and(np.abs(local_x) <= boxes[j, 3] / 2.0,
+                                               np.abs(local_y) <= boxes[j, 4] / 2.0)
 
 
 @numba.jit(nopython=True)
@@ -328,8 +269,10 @@ def box_collision_test(boxes, qboxes, clockwise=True):
                                 vec = boxes[i, k] - boxes[i, (k + 1) % 4]
                                 if clockwise:
                                     vec = -vec
-                                cross = vec[1] * (boxes[i, k, 0] - qboxes[j, l, 0])
-                                cross -= vec[0] * (boxes[i, k, 1] - qboxes[j, l, 1])
+                                cross = vec[1] * \
+                                    (boxes[i, k, 0] - qboxes[j, l, 0])
+                                cross -= vec[0] * \
+                                    (boxes[i, k, 1] - qboxes[j, l, 1])
                                 if cross >= 0:
                                     box_overlap_qbox = False
                                     break
@@ -343,8 +286,10 @@ def box_collision_test(boxes, qboxes, clockwise=True):
                                     vec = qboxes[j, k] - qboxes[j, (k + 1) % 4]
                                     if clockwise:
                                         vec = -vec
-                                    cross = vec[1] * (qboxes[j, k, 0] - boxes[i, l, 0])
-                                    cross -= vec[0] * (qboxes[j, k, 1] - boxes[i, l, 1])
+                                    cross = vec[1] * \
+                                        (qboxes[j, k, 0] - boxes[i, l, 0])
+                                    cross -= vec[0] * \
+                                        (qboxes[j, k, 1] - boxes[i, l, 1])
                                     if cross >= 0:  #
                                         qbox_overlap_box = False
                                         break

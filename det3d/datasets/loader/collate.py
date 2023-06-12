@@ -1,13 +1,10 @@
-import collections
 from collections import defaultdict
-
 import numpy as np
 import torch
 
 
-
 def collate(batch_list):
-    example_merged = collections.defaultdict(list)
+    example_merged = defaultdict(list)
     for example in batch_list:
         for k, v in example.items():
             example_merged[k].append(v)
@@ -34,5 +31,5 @@ def collate(batch_list):
             ret[key] = res
         else:
             ret[key] = torch.tensor(np.stack(elems, axis=0)).float()
-     
+
     return ret

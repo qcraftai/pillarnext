@@ -1,12 +1,13 @@
 import pickle
 from pathlib import Path
-import os 
+import os
 import numpy as np
 from det3d.core import box_np_ops
 from tqdm import tqdm
+import fire
 
 def create_groundtruth_database(
-    dataset_class_name,
+    dataset_name,
     data_path,
     info_path,
     used_classes=None,
@@ -15,10 +16,10 @@ def create_groundtruth_database(
     relative_path=True,
     nsweeps=1
 ):
-    if dataset_class_name == "WAYMO":
+    if dataset_name == "WAYMO":
         from det3d.datasets.waymo.waymo import WaymoDataset
         Dataset = WaymoDataset
-    elif dataset_class_name == "NUSC":
+    elif dataset_name == "NUSC":
         from det3d.datasets.nuscenes import NuScenesDataset
         Dataset = NuScenesDataset
     pipeline = ['load_pointcloud', 'load_box3d']
@@ -33,42 +34,43 @@ def create_groundtruth_database(
         nsweeps = dataset.nsweeps
     else:
         dataset = Dataset(
-            info_path=info_path, 
-            root_path=data_path, 
+            info_path=info_path,
+            root_path=data_path,
             loading_pipelines=pipeline,
             nsweeps=1,
             create_database=True,
         )
         nsweeps = 1
-    
+
     root_path = Path(data_path)
-     
-    if dataset_class_name in ["WAYMO", "NUSC"]: 
+
+    if dataset_name in ["WAYMO", "NUSC"]:
         if db_path is None:
             db_path = root_path / f"gt_database_{nsweeps}sweeps_withvelo"
         if dbinfo_path is None:
-            dbinfo_path = root_path / f"dbinfos_train_{nsweeps}sweeps_withvelo.pkl"
+            dbinfo_path = root_path / \
+                f"dbinfos_train_{nsweeps}sweeps_withvelo.pkl"
     else:
         raise NotImplementedError()
-    
+
     db_path.mkdir(parents=True, exist_ok=True)
-    
+
     all_db_infos = {}
     group_counter = 0
-    
+
     for index in tqdm(range(len(dataset))):
         image_idx = index
         sensor_data = dataset[index]
         if 'token' in sensor_data:
             image_idx = sensor_data['token']
         points = sensor_data['points']
-        
+
         annos = sensor_data['annotations']
         gt_boxes = annos['gt_boxes']
         names = annos['gt_names']
         if gt_boxes.shape[0] == 0:
             continue
-        if dataset_class_name == 'WAYMO':
+        if dataset_name == 'WAYMO':
             if index % 4 != 0:
                 mask = (names == 'vehicle')
                 mask = np.logical_not(mask)
@@ -78,7 +80,7 @@ def create_groundtruth_database(
                 mask = (names == 'pedestrian')
                 mask = np.logical_not(mask)
                 names = names[mask]
-                gt_boxes = gt_boxes[mask]    
+                gt_boxes = gt_boxes[mask]
         group_dict = {}
         group_ids = np.full([gt_boxes.shape[0]], -1, dtype=np.int64)
         if "group_ids" in annos:
@@ -91,7 +93,8 @@ def create_groundtruth_database(
         num_obj = gt_boxes.shape[0]
         if num_obj == 0:
             continue
-        point_indices = box_np_ops.points_in_rbbox(points, gt_boxes[:, [0,1,2,3,4,5,-1]])
+        point_indices = box_np_ops.points_in_rbbox(
+            points, gt_boxes[:, [0, 1, 2, 3, 4, 5, -1]])
         for i in range(num_obj):
             if (used_classes is None) or names[i] in used_classes:
                 filename = f"{image_idx}_{names[i]}_{i}.bin"
@@ -108,7 +111,8 @@ def create_groundtruth_database(
                         break
             if (used_classes is None) or names[i] in used_classes:
                 if relative_path:
-                    db_dump_path = os.path.join(db_path.stem, names[i], filename)
+                    db_dump_path = os.path.join(
+                        db_path.stem, names[i], filename)
                 else:
                     db_dump_path = str(filepath)
                 db_info = {
@@ -136,21 +140,24 @@ def create_groundtruth_database(
     print("dataset length: ", len(dataset))
     for k, v in all_db_infos.items():
         print(f"load {len(v)} {k} database infos")
-    
+
     with open(dbinfo_path, 'wb') as f:
         pickle.dump(all_db_infos, f)
 
+
 if __name__ == "__main__":
+    fire.Fire()
+    '''
     create_groundtruth_database(
-        dataset_class_name="WAYMO",
+        dataset_name="WAYMO",
         data_path='/mnt/sda/jinyu/datasets/waymo_det/',
         info_path='waymo_infos_train.pkl',
         nsweeps=1
     )
     create_groundtruth_database(
-        dataset_class_name="NUSC",
+        dataset_name="NUSC",
         data_path='/mnt/sda/jinyu/datasets/nuscenes/',
         info_path='infos_train_10sweeps_withvelo_filterZero.pkl',
         nsweeps=10
     )
-        
+    '''

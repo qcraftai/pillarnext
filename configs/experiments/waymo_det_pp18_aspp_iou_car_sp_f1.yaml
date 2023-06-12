@@ -15,6 +15,7 @@ data:
     nsweeps: 1
     sampler:
       _target_: det3d.datasets.pipelines.sample_ops.DataBaseSamplerV2
+      _partial_: True
       root_path: ${data.train_dataset.root_path}
       dbinfo_path: dbinfos_train_1sweeps_withvelo.pkl
       groups: 

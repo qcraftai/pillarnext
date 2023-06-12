@@ -1,7 +1,8 @@
 import torch
 from det3d.core.iou3d_nms import iou3d_nms_cuda
 
-def rotate_nms_pcdet(boxes, scores, thresh, pre_maxsize=None, post_max_size=None): 
+
+def rotate_nms_pcdet(boxes, scores, thresh, pre_maxsize=None, post_max_size=None):
     """
     :param boxes: (N, 7) [x, y, z, size_x, size_y, size_z, theta]
     :param scores: (N)
@@ -18,7 +19,7 @@ def rotate_nms_pcdet(boxes, scores, thresh, pre_maxsize=None, post_max_size=None
     keep = torch.LongTensor(boxes.size(0))
 
     if len(boxes) == 0:
-        num_out =0
+        num_out = 0
     else:
         num_out = iou3d_nms_cuda.nms_gpu(boxes, keep, thresh)
 
@@ -27,4 +28,4 @@ def rotate_nms_pcdet(boxes, scores, thresh, pre_maxsize=None, post_max_size=None
     if post_max_size is not None:
         selected = selected[:post_max_size]
 
-    return selected 
+    return selected

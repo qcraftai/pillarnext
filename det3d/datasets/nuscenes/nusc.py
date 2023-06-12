@@ -5,35 +5,38 @@ import os
 import itertools
 from pathlib import Path
 
-from nuscenes.nuscenes import NuScenes
+from nuscenes import NuScenes
 
 from det3d.datasets.base import BaseDataset
 
-from det3d.datasets.nuscenes.scripts.nusc_common import (
+from det3d.datasets.nuscenes.nusc_common import (
     cls_attr_dist,
     _second_det_to_nusc_box,
     _lidar_nusc_box_to_global,
     eval_main
 )
 
+
 class NuScenesDataset(BaseDataset):
 
     def __init__(self,
-                info_path,
-                root_path,
-                nsweeps,
-                sampler=None,
-                loading_pipelines = None,
-                augmentation = None,
-                prepare_label = None,
-                class_names=[],
-                resampling=False,
-                evaluations=None,
-                create_database=False,
-                version="v1.0-trainval"):
-        
+                 info_path,
+                 root_path,
+                 nsweeps,
+                 sampler=None,
+                 loading_pipelines=None,
+                 augmentation=None,
+                 prepare_label=None,
+                 class_names=[],
+                 resampling=False,
+                 evaluations=None,
+                 create_database=False,
+                 use_gt_sampling=True,
+                 version="v1.0-trainval"):
+
         super(NuScenesDataset, self).__init__(
-            root_path, info_path, sampler, loading_pipelines, augmentation, prepare_label, evaluations, create_database)
+            root_path, info_path, sampler, loading_pipelines, augmentation, prepare_label, evaluations, create_database,
+            use_gt_sampling=use_gt_sampling)
 
         self.nsweeps = nsweeps
         assert self.nsweeps > 0, "At least input one sweep please!"
@@ -52,7 +55,8 @@ class NuScenesDataset(BaseDataset):
                     _cls_infos[name].append(info)
 
         duplicated_samples = sum([len(v) for _, v in _cls_infos.items()])
-        _cls_dist = {k: len(v) / duplicated_samples for k, v in _cls_infos.items()}
+        _cls_dist = {k: len(v) / duplicated_samples for k,
+                     v in _cls_infos.items()}
 
         _nusc_infos = []
 
@@ -60,16 +64,17 @@ class NuScenesDataset(BaseDataset):
         ratios = [frac / v for v in _cls_dist.values()]
 
         for cls_infos, ratio in zip(list(_cls_infos.values()), ratios):
-            _nusc_infos += np.random.choice(cls_infos, int(len(cls_infos) * ratio)).tolist()
-        
+            _nusc_infos += np.random.choice(cls_infos,
+                                            int(len(cls_infos) * ratio)).tolist()
+
         self.infos = _nusc_infos
 
-
     def read_file(self, path, num_point_feature=4):
-        points = np.fromfile(os.path.join(self._root_path, path), dtype=np.float32).reshape(-1, 5)[:, :num_point_feature]
+        points = np.fromfile(os.path.join(self._root_path, path),
+                             dtype=np.float32).reshape(-1, 5)[:, :num_point_feature]
         return points
 
-    def read_sweep(self, sweep, min_distance = 1.0):
+    def read_sweep(self, sweep, min_distance=1.0):
         points_sweep = self.read_file(str(sweep["lidar_path"])).T
 
         nbr_points = points_sweep.shape[1]
@@ -80,7 +85,7 @@ class NuScenesDataset(BaseDataset):
         curr_times = sweep["time_lag"] * np.ones((1, points_sweep.shape[1]))
 
         return points_sweep.T, curr_times.T
-    
+
     @staticmethod
     def remove_close(points, radius: float):
         """
@@ -96,12 +101,11 @@ class NuScenesDataset(BaseDataset):
     def load_pointcloud(self, res, info):
 
         lidar_path = info["lidar_path"]
-        
+
         points = self.read_file(str(lidar_path))
 
         sweep_points_list = [points]
         sweep_times_list = [np.zeros((points.shape[0], 1))]
-
 
         for i in range(len(info["sweeps"])):
             sweep = info["sweeps"][i]
@@ -115,7 +119,6 @@ class NuScenesDataset(BaseDataset):
         res["points"] = np.hstack([points, times])
 
         return res
-    
 
     def evaluation(self, detections, output_dir=None, testset=False):
         version = self.version
@@ -133,7 +136,8 @@ class NuScenesDataset(BaseDataset):
             "meta": None,
         }
 
-        nusc = NuScenes(version=version, dataroot=str(self._root_path), verbose=True)
+        nusc = NuScenes(version=version, dataroot=str(
+            self._root_path), verbose=True)
 
         mapped_class_names = []
         for n in self._class_names:
@@ -162,7 +166,7 @@ class NuScenesDataset(BaseDataset):
                     if name in ["pedestrian"]:
                         attr = "pedestrian.standing"
                     elif name in ["bus"]:
-                        attr = "vehicle.stopped"
+                        attr = "vehicle.parked"
                     else:
                         attr = None
 
@@ -233,11 +237,9 @@ class NuScenesDataset(BaseDataset):
 
         if res_nusc is not None:
             res = {
-                "results": {"nusc": res_nusc["results"]["nusc"],},
-                "detail": {"eval.nusc": res_nusc["detail"]["nusc"],},
+                "results": {"nusc": res_nusc["results"]["nusc"], },
+                "detail": {"eval.nusc": res_nusc["detail"]["nusc"], },
             }
             return res['results']
         else:
             return None
-
-        

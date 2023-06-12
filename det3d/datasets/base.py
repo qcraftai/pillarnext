@@ -13,25 +13,30 @@ class BaseDataset(Dataset):
     """
 
     def __init__(
-        self,
-        root_path,
-        info_path,
-        sampler=None,
-        loading_pipelines=None,
-        augmentation=None,
-        prepare_label=None,
-        evaluations=None,
-        create_database=False,):
+            self,
+            root_path,
+            info_path,
+            sampler=None,
+            loading_pipelines=None,
+            augmentation=None,
+            prepare_label=None,
+            evaluations=None,
+            create_database=False,
+            use_gt_sampling=True,):
 
         self._info_path = info_path
         self._root_path = Path(root_path)
         self.loading_pipelines = loading_pipelines
-        self.sampler = sampler
         self.augmentations = augmentation
         self.prepare_label = prepare_label
         self.evaluations = evaluations
         self.create_database = create_database
+        self.use_gt_sampling = use_gt_sampling
         self.load_infos()
+        if use_gt_sampling and sampler is not None:
+            self.sampler = sampler()
+        else:
+            self.sampler = None
 
     def __len__(self):
         return len(self.infos)
@@ -44,31 +49,17 @@ class BaseDataset(Dataset):
         """Dataset must provide a evaluation function to evaluate model."""
         # support different evaluation tasks
         raise NotImplementedError
-        #if self.evaluations is not None:
-        #    for eval in self.evaluations:
-        #        res = getattr(self, eval)(res, info)
 
-    
     def load_pointcloud(self, res, info):
         raise NotImplementedError
-    
-    def load_images(self, res, info):
-        raise NotImplementedError
-    
+
     def load_box3d(self, res, info):
         res["annotations"] = {
-                            'gt_boxes': info["gt_boxes"].astype(np.float32).copy(), 
-                            'gt_names': np.array(info["gt_names"]).reshape(-1).copy(),
-                            }
-        
+            'gt_boxes': info["gt_boxes"].astype(np.float32).copy(),
+            'gt_names': np.array(info["gt_names"]).reshape(-1).copy(),
+        }
+
         return res
-    
-    def load_box2d(self, res, info):
-        raise NotImplementedError
-    
-    def load_pointseg(self, res):
-        raise NotImplementedError
-    
 
     def __getitem__(self, idx):
 
@@ -96,26 +87,25 @@ class BaseDataset(Dataset):
                 )
 
                 # remove points in sampled gt boxes
-                sampled_point_indices = box_np_ops.points_in_rbbox(res['points'], sampled_gt_boxes[sampled_gt_masks])
-                res['points'] = res['points'][np.logical_not(sampled_point_indices.any(-1))]
+                sampled_point_indices = box_np_ops.points_in_rbbox(
+                    res['points'], sampled_gt_boxes[sampled_gt_masks])
+                res['points'] = res['points'][np.logical_not(
+                    sampled_point_indices.any(-1))]
 
-                res['points'] = np.concatenate([sampled_points, res['points']], axis=0)
+                res['points'] = np.concatenate(
+                    [sampled_points, res['points']], axis=0)
         if self.augmentations is not None:
             for aug in self.augmentations.values():
                 res = aug(res)
-        
+
         if self.prepare_label is not None:
             for _, pl in self.prepare_label.items():
                 res = pl(res)
 
-        if 'annotations' in res and self.create_database == False:
+        if 'annotations' in res and (not self.create_database):
             del res['annotations']
-            
+
         return res
 
     def format_eval(self):
         raise NotImplementedError
-
-
-    
-   
