@@ -1,13 +1,11 @@
 # PillarNeXt: Rethinking Network Designs for 3D Object Detection in LiDAR Point Clouds
 
-Official code for *PillarNeXt: Rethinking Network Designs for 3D Object Detection in LiDAR Point Clouds.* &nbsp;  [[paper]](https://openaccess.thecvf.com/content/CVPR2023/html/Li_PillarNeXt_Rethinking_Network_Designs_for_3D_Object_Detection_in_LiDAR_CVPR_2023_paper.html)&nbsp;&nbsp;[[arxiv]](https://arxiv.org/abs/2305.04925)
 
-Jinyu Li, Chenxu Luo, Xiaodong Yang
+[Jinyu Li](), [Chenxu Luo](https://chenxuluo.github.io/), [Xiaodong Yang](https://xiaodongyang.org/) <br>
+PillarNeXt: Rethinking Network Designs for 3D Object Detection in LiDAR Point Clouds, CVPR 2023 <br>
+[[Paper]](https://arxiv.org/pdf/2305.04925.pdf) 
 
-
-
-
-<p align="center"> <img src='docs/arch.png' align="center" height="230px"> </p>
+<p align="center"> <img src='docs/teaser.png' align="left" height="480px"> </p>
 
 ## Get Started
 
