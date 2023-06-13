@@ -3,7 +3,7 @@
 
 [Jinyu Li](), [Chenxu Luo](https://chenxuluo.github.io/), [Xiaodong Yang](https://xiaodongyang.org/) <br>
 PillarNeXt: Rethinking Network Designs for 3D Object Detection in LiDAR Point Clouds, CVPR 2023 <br>
-[[Paper]](https://arxiv.org/pdf/2305.04925.pdf) 
+[[Paper]](https://arxiv.org/pdf/2305.04925.pdf) [[Poster]]() 
 
 <p align="left"> 
  <img src='docs/teaser.png' height="480px"/> 
