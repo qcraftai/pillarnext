@@ -6,7 +6,7 @@ PillarNeXt: Rethinking Network Designs for 3D Object Detection in LiDAR Point Cl
 [[Paper]](https://arxiv.org/pdf/2305.04925.pdf) [[Poster]]() 
 
 <p align="left"> 
- <img src='docs/teaser_figure.png' height="400px"/> 
+ <img src='docs/teaser_figure.png' height="420px"/> 
 </p>
 
 ## Get Started
