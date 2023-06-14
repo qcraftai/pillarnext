@@ -47,7 +47,7 @@ Please follow the instructions in [RUN](docs/RUN.md).
 ```
 
 ## Acknowledgement
-This project is impossible without multiple open-sourced repos. We thank the authors for their great works.
+We thank the authors for the multiple great open-sourced repos.
 * [Det3D](https://github.com/poodarchu/Det3D)
 * [CenterPoint](https://github.com/tianweiy/CenterPoint)
 * [OpenPCDet](https://github.com/open-mmlab/OpenPCDet)
