@@ -18,7 +18,7 @@ Please refer to [INSTALL](docs/INSTALL.md) to set up environment and install dep
 Please follow the instructions in [DATA](docs/DATA.md). 
 
 ### Training and Evaluation 
-Please follow the instructions in [Training](docs/Training.md).
+Please follow the instructions in [Running](docs/Running.md).
 
 
 ## Main Results
