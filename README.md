@@ -15,42 +15,39 @@ PillarNeXt: Rethinking Network Designs for 3D Object Detection in LiDAR Point Cl
 Please refer to [INSTALL](docs/INSTALL.md) to set up environment and install dependencies (see detail in [Dockerfile](docker/Dockerfile)).
 
 ### Data Preparation
-Please refer to [DATA](docs/DATA.md) for detail. 
+Please follow the instructions in [DATA](docs/DATA.md). 
 
 ### Training and Evaluation 
-Please refer to [Training](docs/Training.md) for detail.
+Please follow the instructions in [Training](docs/Training.md).
 
 
 ## Main Results
-### nuScenes (val)
+### nuScenes (Val)
 | Model |  mAP  |  NDS | checkpoint
 | ------| -----| ---- | -------------|
- | PillarNeXt-B| 62.5 | 68.8	 | [[Google Drive]](https://drive.google.com/file/d/16abCgt-yhRGnYHQ7M259yGMO0IRYpZ8o/view?usp=drive_link)  &nbsp;&nbsp;[[Baidu Yunpan]](https://pan.baidu.com/s/1TRsjgN1ys5-mAxM70l4hog?pwd=7skt)(7skt)
+ | PillarNeXt-B| 62.5 | 68.8	 | [[Google Drive]](https://drive.google.com/file/d/16abCgt-yhRGnYHQ7M259yGMO0IRYpZ8o/view?usp=drive_link)  &nbsp;&nbsp;[[Baidu Cloud]](https://pan.baidu.com/s/1TRsjgN1ys5-mAxM70l4hog?pwd=7skt)(7skt)
 
 ### Waymo Open Dataset 
-|Split | #frames | Veh L2 | Ped L2 | Cyc L2 | 
+|Split | #frames | Vehicle L2 3D mAPH | Pedestrian L2 | Cyclist L2 | 
 | ---------| ---------|---------|---------|---------|
-| val | 1 | 67.8 | 69.8 | 69.6|
-| val | 3| 72.4 | 75.2 | 75.7 |
-| test| 3 | 75.8 | 76.0 | 70.6 |
-
-All numbers are 3D mAPH. 
+| Val | 1 | 67.8 | 69.8 | 69.6|
+| Val | 3| 72.4 | 75.2 | 75.7 |
+| Test| 3 | 75.8 | 76.0 | 70.6 |
 
 
 ## Citation
- If you find this code useful in your research, please consider citing:
+ Please cite the following paper if this repo helps your research:
 ```
 @inproceedings{li2023pillarnext,
   title={PillarNeXt: Rethinking Network Designs for 3D Object Detection in LiDAR Point Clouds},
   author={Li, Jinyu and Luo, Chenxu and Yang, Xiaodong},
   booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
-  pages={17567--17576},
   year={2023}
 }
 ```
 
 ### Acknowledgement
 This project is not possible without multiple great opensourced codebases. We list some notable examples below.
-* [det3d](https://github.com/poodarchu/Det3D)
+* [Det3D](https://github.com/poodarchu/Det3D)
 * [CenterPoint](https://github.com/tianweiy/CenterPoint)
 * [OpenPCDet](https://github.com/open-mmlab/OpenPCDet)
