@@ -39,6 +39,6 @@ torchrun --standalone --nnodes=1 --nproc_per_node=8   \
 ```
 For Waymo, we apply faded strategy in the last 4 epochs.
 
-Note: The results repored in Table 4-6 are trained on 32 GPUs, you can refer to this [script](tools/dist_train_waymo.sh) for detail. The performance may be slightly different if you are only using 8 GPUs. 
+Note: The results repored in Table 4-6 are trained on 32 GPUs, you can refer to this [script](../tools/dist_train_waymo.sh) for detail. The performance may be slightly different if you are only using 8 GPUs. 
 
 For evaluation, please use the official [evaluation tools](https://github.com/waymo-research/waymo-open-dataset/blob/r1.3/docs/quick_start.md) 
