@@ -18,7 +18,7 @@ Please refer to [INSTALL](docs/INSTALL.md) to set up environment and install dep
 Please follow the instructions in [DATA](docs/DATA.md). 
 
 ### Training and Evaluation 
-Please follow the instructions in [Running](docs/Running.md).
+Please follow the instructions in [RUN](docs/RUN.md).
 
 
 ## Main Results
@@ -47,7 +47,7 @@ Please follow the instructions in [Running](docs/Running.md).
 ```
 
 ## Acknowledgement
-This project is not possible without multiple great open-sourced repos. Thanks the authors for their great works.
+This project is impossible without multiple open-sourced repos. We thank the authors for their great works.
 * [Det3D](https://github.com/poodarchu/Det3D)
 * [CenterPoint](https://github.com/tianweiy/CenterPoint)
 * [OpenPCDet](https://github.com/open-mmlab/OpenPCDet)
