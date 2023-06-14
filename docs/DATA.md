@@ -8,7 +8,7 @@ Download data and organize as follows
        ├── maps          <-- unused
        ├── v1.0-trainval <-- metadata
 ```
-### create data
+Run
 ```
 python tools/create_data  nuscenes_data_prep --root_path /path/to/nuscenes
 ```
@@ -26,4 +26,3 @@ Run
 ```
 python tools/create_data.py waymo_data_prep /path/to/raw/waymo/ /path/to/save/converted_waymo/ 
 ```
-to generate data for waymo
