@@ -41,7 +41,7 @@ Please follow the instructions in [RUN](docs/RUN.md).
 @inproceedings{li2023pillarnext,
   title={PillarNeXt: Rethinking Network Designs for 3D Object Detection in LiDAR Point Clouds},
   author={Li, Jinyu and Luo, Chenxu and Yang, Xiaodong},
-  booktitle={IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  booktitle={IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
   year={2023}
 }
 ```
