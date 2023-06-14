@@ -12,12 +12,12 @@ PillarNeXt: Rethinking Network Designs for 3D Object Detection in LiDAR Point Cl
 ## Getting Started
 
 ### Installation
-Please refer to [INSTALL](docs/INSTALL.md) to set up environment and install dependencies. Please refer to the [Dockerfile](docker/Dockerfile) for detail.
+Please refer to [INSTALL](docs/INSTALL.md) to set up environment and install dependencies (see detail in [Dockerfile](docker/Dockerfile)).
 
 ### Data Preparation
 Please refer to [DATA](docs/DATA.md) for detail. 
 
-### Training and Evalution 
+### Training and Evaluation 
 Please refer to [Training](docs/Training.md) for detail.
 
 
