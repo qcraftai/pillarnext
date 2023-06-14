@@ -25,7 +25,7 @@ Please follow the instructions in [Training](docs/Training.md).
 ### nuScenes (Val)
 | Model |  mAP  |  NDS | Checkpoint
 | ------| -----| ---- | -------------|
- | PillarNeXt-B | 62.5 | 68.8	| [[Google Drive]](https://drive.google.com/file/d/16abCgt-yhRGnYHQ7M259yGMO0IRYpZ8o/view?usp=drive_link)  &nbsp;&nbsp;[[Baidu Cloud]](https://pan.baidu.com/s/1TRsjgN1ys5-mAxM70l4hog?pwd=7skt)
+ | PillarNeXt-B | 62.5 | 68.8	| [[Google Drive]](https://drive.google.com/file/d/16abCgt-yhRGnYHQ7M259yGMO0IRYpZ8o/view?usp=drive_link) &nbsp;&nbsp;[[Baidu Cloud]](https://pan.baidu.com/s/1TRsjgN1ys5-mAxM70l4hog?pwd=7skt)
 
 ### Waymo Open Dataset 
 |Split | #Frames | Veh L2 3D APH | Ped L2 3D APH | Cyc L2 3D APH | 
