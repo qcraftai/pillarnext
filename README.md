@@ -28,7 +28,7 @@ Please follow the instructions in [Training](docs/Training.md).
  | PillarNeXt-B | 62.5 | 68.8	| [[Google Drive]](https://drive.google.com/file/d/16abCgt-yhRGnYHQ7M259yGMO0IRYpZ8o/view?usp=drive_link)  &nbsp;&nbsp;[[Baidu Cloud]](https://pan.baidu.com/s/1TRsjgN1ys5-mAxM70l4hog?pwd=7skt)
 
 ### Waymo Open Dataset 
-|Split | #Frames | Veh L2 3D mAPH | Ped L2 | Cyc L2 | 
+|Split | #Frames | Veh L2 3D APH | Ped L2 3D APH | Cyc L2 3D APH | 
 | ---------| ---------|---------|---------|---------|
 | Val | 1 | 67.8 | 69.8 | 69.6 |
 | Val | 3 | 72.4 | 75.2 | 75.7 |
