@@ -139,8 +139,7 @@ def extract_images(frame):
     return images_list
 
 
-def convert(scene, save_root):
-    fname = scene
+def convert(fname, save_root):
     dataset = tf.data.TFRecordDataset(fname, compression_type='')
     all_frames = []
     for frame_id, data in enumerate(dataset):
