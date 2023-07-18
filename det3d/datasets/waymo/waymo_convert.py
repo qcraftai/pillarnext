@@ -139,8 +139,8 @@ def extract_images(frame):
     return images_list
 
 
-def convert(idx, save_root):
-    fname = scenes[idx]
+def convert(scene, save_root):
+    fname = scene
     dataset = tf.data.TFRecordDataset(fname, compression_type='')
     all_frames = []
     for frame_id, data in enumerate(dataset):
@@ -193,7 +193,7 @@ def create_waymo_infos(root_path, save_path):
         scenes = list(glob.glob(os.path.join(root_path, split, '*.tfrecord')))
         for scene in tqdm(scenes):
             all_infos += convert(scene, save_path)
-        with open(os.path.join(save_root, 'waymo_infos_' + split + '.pkl'), 'wb') as f:
+        with open(os.path.join(save_path, 'waymo_infos_' + split + '.pkl'), 'wb') as f:
             pickle.dump(all_infos, f)
 
 
