@@ -30,7 +30,7 @@ Please follow the instructions in [RUN](docs/RUN.md).
 ### Waymo Open Dataset 
 |Split | #Frames | Veh L2 3D APH | Ped L2 3D APH | Cyc L2 3D APH | 
 | ---------| ---------|---------|---------|---------|
-| Val | 1 | 67.8 | 69.8 | 69.6 |
+| Val | 1 | 69.8 | 69.8 | 69.6 |
 | Val | 3 | 72.4 | 75.2 | 75.7 |
 | Test| 3 | 75.8 | 76.0 | 70.6 |
 
