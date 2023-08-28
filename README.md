@@ -47,10 +47,7 @@ Please follow the instructions in [RUN](docs/RUN.md).
 ```
 
 ## Acknowledgement
-We thank the authors for the multiple great open-sourced repos.
-* [Det3D](https://github.com/poodarchu/Det3D)
-* [CenterPoint](https://github.com/tianweiy/CenterPoint)
-* [OpenPCDet](https://github.com/open-mmlab/OpenPCDet)
+We thank the authors for the multiple great open-sourced repos, including [Det3D](https://github.com/poodarchu/Det3D), [CenterPoint](https://github.com/tianweiy/CenterPoint) and [OpenPCDet](https://github.com/open-mmlab/OpenPCDet). 
 
 ## License
 Copyright (C) 2023 QCraft. All rights reserved. Licensed under the [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode) (Attribution-NonCommercial-ShareAlike 4.0 International). The code is released for academic research use only. For commercial use, please contact [business@qcraft.ai](business@qcraft.ai).
